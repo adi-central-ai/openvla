@@ -840,6 +840,19 @@ def libero_dataset_transform(trajectory: Dict[str, Any]) -> Dict[str, Any]:
     trajectory["observation"]["gripper_state"] = trajectory["observation"]["state"][:, -2:]  # 2D gripper state
     return trajectory
 
+def xarm_tfds_transform(trajectory: Dict[str, Any]) -> Dict[str, Any]:
+    gripper_action = trajectory["action"][:, -1:]
+    # from bridge
+    trajectory["action"] = tf.concat(
+        [
+            trajectory["action"][:, :6],
+            binarize_gripper_actions(trajectory["action"][:, -1])[:, None],
+        ],
+        axis=1,
+    )
+    trajectory["observation"]["EEF_state"] = trajectory["observation"]["state"][:, :6]
+    trajectory["observation"]["gripper_state"] = gripper_action 
+    return trajectory
 
 # === Registry ===
 OXE_STANDARDIZATION_TRANSFORMS = {
@@ -919,4 +932,5 @@ OXE_STANDARDIZATION_TRANSFORMS = {
     "libero_object_no_noops": libero_dataset_transform,
     "libero_goal_no_noops": libero_dataset_transform,
     "libero_10_no_noops": libero_dataset_transform,
+    "xarm_tfds": xarm_tfds_transform,
 }

@@ -301,7 +301,7 @@ def finetune(cfg: FinetuneConfig) -> None:
             smoothened_l1_loss = sum(recent_l1_losses) / len(recent_l1_losses)
 
             # Push Metrics to W&B (every 10 gradient steps)
-            if distributed_state.is_main_process and gradient_step_idx % 10 == 0:
+            if distributed_state.is_main_process and gradient_step_idx % 2 == 0:
                 wandb.log(
                     {
                         "train_loss": smoothened_loss,
@@ -371,3 +371,20 @@ def finetune(cfg: FinetuneConfig) -> None:
 
 if __name__ == "__main__":
     finetune()
+
+'''
+Command used:
+
+torchrun --standalone --nnodes 1 --nproc-per-node 1 vla-scripts/finetune.py \
+--vla_path "openvla/openvla-7b" \
+--data_root_dir "/workspaces/openVLA/dataset" \
+--dataset_name xarm_tfds \
+--run_root_dir "/workspaces/openVLA/run_dir" \
+--adapter_tmp_dir "/workspaces/openVLA/run_dir/adapter" \
+--lora_rank 32 \
+--batch_size 8 \
+--grad_accumulation_steps 1 \
+--learning_rate 5e-4 \
+--image_aug True \
+--save_steps 10
+'''
