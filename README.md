@@ -1,3 +1,51 @@
+## OpenVLA finetuning
+
+OneDrive [Link] (https://analog-my.sharepoint.com/my?id=%2Fpersonal%2Faditya%5Fkumar%5Fanalog%5Fcom%2FDocuments%2FOpenVLA)
+
+Finetuned OpenVLA model files trained over the `xarm_tfds` dataset collected manually with LoRA of rank 32.  
+
+[Wandb Train log](https://wandb.ai/aditya-kumar-analog-devices/xarm_adi?nw=nwuseradityakumar)
+
+### Instructions for LoRA finetuning
+1. Follow below instructions for installation (from [OpenVLA](https://github.com/openvla/openvla))
+2. `xarm_tfds` dataset was converted to tfds format using [this](https://github.com/adi-central-ai/xarm_datacollect).
+3. Below additions were done for config and transform changes.
+
+#### Adding dataset configuration
+`openvla/prismatic/vla/datasets/rlds/oxe
+/configs.py`
+```
+"xarm_tfds": {
+        "image_obs_keys": {"primary": "image", "secondary": None, "wrist": None},
+        "depth_obs_keys": {"primary": None, "secondary": None, "wrist": None},
+        "state_obs_keys": ["state", None, None],
+        "state_encoding": StateEncoding.POS_EULER,
+        "action_encoding": ActionEncoding.EEF_POS,
+    },
+```
+
+#### Adding Transforms 
+`openvla/prismatic/vla/datasets/rlds/oxe
+/transforms.py`
+
+```
+def xarm_tfds_transform(trajectory: Dict[str, Any]) -> Dict[str, Any]:
+    gripper_action = trajectory["action"][:, -1:]
+    # from bridge
+    trajectory["action"] = tf.concat(
+        [
+            trajectory["action"][:, :6],
+            binarize_gripper_actions(trajectory["action"][:, -1])[:, None],
+        ],
+        axis=1,
+    )
+    trajectory["observation"]["EEF_state"] = trajectory["observation"]["state"][:, :6]
+    trajectory["observation"]["gripper_state"] = gripper_action 
+    return trajectory
+
+```
+
+
 # OpenVLA: An Open-Source Vision-Language-Action Model
 
 [![arXiv](https://img.shields.io/badge/arXiv-2406.09246-df2a2a.svg?style=for-the-badge)](https://arxiv.org/abs/2406.09246)
