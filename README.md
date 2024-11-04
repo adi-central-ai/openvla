@@ -1,6 +1,6 @@
 ## OpenVLA finetuning
 
-OneDrive [Link] (https://analog-my.sharepoint.com/my?id=%2Fpersonal%2Faditya%5Fkumar%5Fanalog%5Fcom%2FDocuments%2FOpenVLA)
+OneDrive [Link](https://analog-my.sharepoint.com/my?id=%2Fpersonal%2Faditya%5Fkumar%5Fanalog%5Fcom%2FDocuments%2FOpenVLA)
 
 Finetuned OpenVLA model files trained over the `xarm_tfds` dataset collected manually with LoRA of rank 32.  
 
